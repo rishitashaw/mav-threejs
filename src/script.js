@@ -12,6 +12,8 @@ import { TimelineMax } from "gsap";
 
 import * as gui from "dat.gui";
 
+import texture from "../static/textures/door.jpg";
+
 export default class Sketch {
   constructor() {
     this.renderer = new THREE.WebGLRenderer({
@@ -65,6 +67,14 @@ export default class Sketch {
         progress: { type: "f", value: 0 },
       },
       side: THREE.DoubleSide,
+      uniforms: {
+        time: { type: "f", value: 0 },
+        texture: { type: "t", value: new THREE.TextureLoader().load(texture) },
+        resolution: { type: "v4", value: new THREE.Vector4() },
+        uvRate1: {
+          value: new THREE.Vector2(1, 1),
+        },
+      },
     });
 
     let number = 512 * 512;
