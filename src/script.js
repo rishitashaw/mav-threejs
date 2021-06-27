@@ -12,7 +12,7 @@ import { TimelineMax } from "gsap";
 
 import * as gui from "dat.gui";
 
-import texture from "../static/textures/door.jpg";
+import texture from "../static/textures/1.jpg";
 
 export default class Sketch {
   constructor() {
@@ -69,9 +69,9 @@ export default class Sketch {
       side: THREE.DoubleSide,
       uniforms: {
         time: { type: "f", value: 0 },
-        texture: {
-          type: "t",
-          value: new THREE.TextureLoader().load("textures/door.jpg"),
+        sky: {
+          type: "f",
+          value: new THREE.TextureLoader().load(texture),
         },
         resolution: { type: "v4", value: new THREE.Vector4() },
         uvRate1: {
