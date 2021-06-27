@@ -69,7 +69,10 @@ export default class Sketch {
       side: THREE.DoubleSide,
       uniforms: {
         time: { type: "f", value: 0 },
-        texture: { type: "t", value: new THREE.TextureLoader().load(texture) },
+        texture: {
+          type: "t",
+          value: new THREE.TextureLoader().load("textures/door.jpg"),
+        },
         resolution: { type: "v4", value: new THREE.Vector4() },
         uvRate1: {
           value: new THREE.Vector2(1, 1),
