@@ -1,147 +1,100 @@
 import "./style.css";
 import * as THREE from "three";
+
+import fragment from "./shaders/fragment.glsl";
+import vertex from "./shaders/vertex.glsl";
+
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import * as dat from "dat.gui";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
-// Debug
-const gui = new dat.GUI();
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-// Canvas
-const canvas = document.querySelector("canvas.webgl");
+import { TimelineMax } from "gsap";
 
-// Instantiate a loader
-const loader = new GLTFLoader();
+import * as gui from "dat.gui";
 
-// Scene
-const scene = new THREE.Scene();
+export default class Sketch {
+  constructor() {
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+    });
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setSize(this.width, this.height);
+    this.renderer.setClearColor(0xeeeeee, 1);
+    this.renderer.physicallyCorrectLights = true;
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById("container").appendChild(this.renderer.domElement);
 
-// Load a glTF resource
-loader.load(
-  // resource URL
-  "models/scene.gltf",
-  // called when the resource is loaded
-  function (gltf) {
-    console.log(gltf);
+    this.camera = new THREE.PerspectiveCamera(
+      70,
+      window.innerWidth / window.innerHeight,
+      0.01,
+      3000
+    );
+    this.camera.position.set(0, 0, 1000);
 
-    gltf.scene.scale.set(0.055, 0.055, 0.055);
-    scene.add(gltf.scene);
+    this.scene = new THREE.Scene();
+    this.isPlaying = true;
 
-    // gltf.animations; // Array<THREE.AnimationClip>
-    // gltf.scene; // THREE.Group
-    // gltf.scenes; // Array<THREE.Group>
-    // gltf.cameras; // Array<THREE.Camera>
-    // gltf.asset; // Object
-  },
-  // called while loading is progressing
-  function (xhr) {
-    console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-  },
-  // called when loading has errors
-  function (error) {
-    console.log("An error happened");
+    this.time = 0;
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.addMesh();
+
+    this.render();
+
+    //loader
+    this.loader = new GLTFLoader();
+    this.loader.load("models/scene.gltf", (gltf) => {
+      this.scene.add(gltf.scene);
+
+      gltf.scene.traverse((o) => {
+        if (o.isMesh) {
+          o.scale.set(4, 4, 4);
+          o.position.y = -3;
+          o.material = this.material;
+        }
+      });
+    });
   }
-);
 
-/**
- * Floor
- */
-const floor = new THREE.Mesh(
-  new THREE.PlaneBufferGeometry(10, 10),
-  new THREE.MeshStandardMaterial({
-    color: "#444444",
-    metalness: 0,
-    roughness: 0.5,
-  })
-);
-floor.receiveShadow = true;
-floor.position.y = -1;
-floor.rotation.x = -Math.PI * 0.5;
-scene.add(floor);
-/**
- * Lights
- */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-scene.add(ambientLight);
+  addMesh() {
+    this.material = new THREE.ShaderMaterial({
+      fragmentShader: fragment,
+      vertexShader: vertex,
+      uniforms: {
+        progress: { type: "f", value: 0 },
+      },
+      side: THREE.DoubleSide,
+    });
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.set(1024, 1024);
-directionalLight.shadow.camera.far = 15;
-directionalLight.shadow.camera.left = -7;
-directionalLight.shadow.camera.top = 7;
-directionalLight.shadow.camera.right = 7;
-directionalLight.shadow.camera.bottom = -7;
-directionalLight.position.set(-5, 5, 0);
-scene.add(directionalLight);
+    let number = 512 * 512;
 
-/**
- * Sizes
- */
-const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-};
+    this.geometry = new THREE.BufferGeometry();
+    this.position = new THREE.BufferAttribute(new Float32Array(number * 3), 3);
 
-window.addEventListener("resize", () => {
-  // Update sizes
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
+    let index = 0;
+    for (let i = 0; i < 512; i++) {
+      let posX = i - 256;
+      for (let j = 0; j < 512; j++) {
+        this.position.setXYZ(index, posX * 2, (j - 256) * 2, 0);
+        index++;
+      }
+    }
 
-  // Update camera
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
+    this.geometry.setAttribute("position", this.position);
 
-  // Update renderer
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
+    this.mesh = new THREE.Points(this.geometry, this.material);
+    // this.scene.add(this.mesh);
+  }
 
-/**
- * Camera
- */
-// Base camera
-const camera = new THREE.PerspectiveCamera(
-  75,
-  sizes.width / sizes.height,
-  0.1,
-  100
-);
-camera.position.x = 0;
-camera.position.y = -1;
-camera.position.z = 5;
-scene.add(camera);
+  render() {
+    this.time++;
+    //this.mesh.rotation.x += 0.01;
+    //this.mesh.rotation.y += 0.01;
 
-// Controls
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+    this.renderer.render(this.scene, this.camera);
+    window.requestAnimationFrame(this.render.bind(this));
+  }
+}
 
-/**
- * Renderer
- */
-const renderer = new THREE.WebGLRenderer({
-  canvas: canvas,
-});
-renderer.setSize(sizes.width, sizes.height);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-/**
- * Animate
- */
-
-const clock = new THREE.Clock();
-
-const tick = () => {
-  const elapsedTime = clock.getElapsedTime();
-
-  // Update Orbital Controls
-  controls.update();
-
-  // Render
-  renderer.render(scene, camera);
-
-  // Call tick again on the next frame
-  window.requestAnimationFrame(tick);
-};
-
-tick();
+new Sketch();

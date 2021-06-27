@@ -25,6 +25,9 @@
     "webpack": "^5.24.2",
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2",
-    "webpack-merge": "^5.7.3"
+    "webpack-merge": "^5.7.3",
+    "glslify": "^6.2.1",
+    "glslify-import-loader": "^0.1.2",
+    "glslify-loader": "^1.0.2"
   }
 }
