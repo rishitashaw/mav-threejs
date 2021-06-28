@@ -145,8 +145,24 @@ float cnoise(vec4 P, vec4 rep){
 
 void main(){
     float diff = dot(vec3(1.),vNormal);
-    vec4 txt = texture2D(sky,vUv+.2*cnoise(vec4(vUv*20.,time/10.,0.),vec4(10.)));
-    gl_FragColor = vec4(vUv,1., 1.);
+    
+    float phi = acos(vNormal.y);
+    float angle = atan(vNormal.x,vNormal.z);
+
+float fresnel = dot(cameraPosition, vNormal);
+fresnel=fresnel*fresnel*fresnel;
+
+    vec2 newFakeUV =vec2((angle+PI)/(2.*PI),phi/PI);
+
+    vec2 fakeUV = vec2(dot(vec3(1.),vNormal),dot(vec3(-1.,0.,1.),vNormal));
+    //fakeUV=abs(fakeUV);
+    fakeUV=fract(fakeUV+vec2(time/40.,time/2.));
+
+    vec4 txt = texture2D(sky,newFakeUV+.2*cnoise(vec4(fakeUV*5.,time/100.,0.),vec4(10.)));
+
+    gl_FragColor=vec4(mix(vec3(1.),txt.rgb,fresnel),1.);
+
+    //gl_FragColor = vec4(vUv,1., 1.);
     //gl_FragColor = vec4(vNormal, 1.0);
     //gl_FragColor = vec4(abs(sin(diff* 10.)));
     gl_FragColor = txt;

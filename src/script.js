@@ -21,7 +21,7 @@ export default class Sketch {
     });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setClearColor(0xeeeeee, 1);
+    this.renderer.setClearColor(0x000, 1);
     this.renderer.physicallyCorrectLights = true;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -33,7 +33,7 @@ export default class Sketch {
       0.01,
       3000
     );
-    this.camera.position.set(0, 0, 1000);
+    this.camera.position.set(0, 0, 200);
 
     this.scene = new THREE.Scene();
     this.isPlaying = true;
@@ -46,13 +46,13 @@ export default class Sketch {
 
     //loader
     this.loader = new GLTFLoader();
-    this.loader.load("models/scene.gltf", (gltf) => {
+    this.loader.load("man2/scene.gltf", (gltf) => {
       this.scene.add(gltf.scene);
-
+      gltf.scene.position.y = -1000;
       gltf.scene.traverse((o) => {
         if (o.isMesh) {
-          o.scale.set(4, 4, 4);
-          o.position.y = -3;
+          o.scale.set(6, 6, 6);
+
           o.material = this.material;
         }
       });
