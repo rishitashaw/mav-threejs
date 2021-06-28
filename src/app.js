@@ -1,5 +1,3 @@
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger.js";
-import SplitText from "gsap/SplitText.js";
+//import Sketch from "./script";
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+//let sketch = new Sketch();

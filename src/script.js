@@ -1,5 +1,10 @@
 import "./style.css";
-import "./app.js";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger.js";
+//import SplitText from "gsap/SplitText.js";
+
+gsap.registerPlugin(ScrollTrigger);
+
 import * as THREE from "three";
 
 import fragment from "./shaders/fragment.glsl";
@@ -48,6 +53,7 @@ export default class Sketch {
     //loader
     this.loader = new GLTFLoader();
     this.loader.load("man2/scene.gltf", (gltf) => {
+      this.model = gltf.scene;
       this.scene.add(gltf.scene);
       gltf.scene.position.y = -1000;
       gltf.scene.traverse((o) => {
@@ -77,6 +83,22 @@ export default class Sketch {
         resolution: { type: "v4", value: new THREE.Vector4() },
         uvRate1: {
           value: new THREE.Vector2(1, 1),
+        },
+      },
+    });
+    let o = { a: 0 };
+    gsap.to(o, {
+      a: 1,
+      scrollTrigger: {
+        trigger: document.querySelector(".wrap"),
+        //markers: true,
+        scrub: 2,
+        start: "top top",
+        end: "bottom bottom",
+        snap: 1 / 2,
+        onUpdate: (self) => {
+          this.model.rotation.y = 2 * Math.PI * self.progress;
+          this.model.position.z = -1000 * Math.sin(Math.PI * self.progress);
         },
       },
     });
