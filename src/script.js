@@ -1,4 +1,5 @@
 import "./style.css";
+import "./app.js";
 import * as THREE from "three";
 
 import fragment from "./shaders/fragment.glsl";
