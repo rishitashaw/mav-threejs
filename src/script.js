@@ -56,6 +56,7 @@ export default class Sketch {
       this.model = gltf.scene;
       this.scene.add(gltf.scene);
       gltf.scene.position.y = -1000;
+
       gltf.scene.traverse((o) => {
         if (o.isMesh) {
           o.scale.set(6, 6, 6);
