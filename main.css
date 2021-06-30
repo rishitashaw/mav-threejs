@@ -42,5 +42,18 @@ canvas {
   width: 15vw;
 }
 
+@media only screen and (max-width: 800px) {
+  .section {
+    padding: 7rem 2rem;
+  }
+  .section h1 {
+    font-size: 15vw;
+    margin: 5rem auto;
+  }
+  .section p {
+    width: 75vw;
+  }
+}
+
 
 /*# sourceMappingURL=main.css.map*/
